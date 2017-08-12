@@ -1,0 +1,119 @@
+#! /app/bin/node
+var mysql = require('mysql');
+var connection = mysql.createConnection(process.env.JAWSDB_URL);
+
+connection.connect();
+
+var Nightmare = require('nightmare');	
+// TODO : make show: false to avoid the window popping up	
+var nightmare = Nightmare({ show: true });
+
+var do512events = [];
+
+//SETTING UP DATES FOR URL
+
+var d = new Date();
+
+var mainUrl = 'http://do512.com/';
+
+var getUrl = function(dayOffset) {
+  var date = new Date()
+  var day = date.getDate() + dayOffset
+  var year = date.getFullYear();
+  var month = date.getMonth() + 1;
+  return `http://do512.com/events/${year}/${month}/${day}`
+}
+
+//creating an array of objects that will be cycled thru in the accumulator function below,
+//holds data that will point to the correct url and div child on the event page
+var nums = [];
+
+for (var i = 6; i < 7; i++) {
+  for (var z = 1; z < 16; z++){
+    if (z==4 || z==6) continue;
+    nums.push(
+      {
+        num: z,
+        url: getUrl(i)
+      }
+    );
+  }
+}
+
+
+//this allows us to run nightmare instances in series instead of in an asynchronous manner
+nums.reduce(function(accumulator, x) {
+  return accumulator.then(function(results){
+    return nightmare
+    .goto(x.url)
+    .wait(3000)
+    .click('#ds-events-list-outlet div.ds-listings.ds-listings-list div.ds-events-page div.ds-events-group div.ds-listing.event-card:nth-of-type('+x.num+') div.ds-cover-image')
+    .wait(3000)
+    .evaluate(function () {
+        obj = {
+        title: '',
+        date: '',
+        time: '',
+        ticketInfo: '',
+        venue: '',
+        latitude: '',
+        longitude: '',
+        upvotes: '',
+        link: ''
+      };
+
+    //TODO: CHECK IF EACH EXISTS, IF NOT, FUCK THIS PAGE
+    var title = document.querySelector('div.ds-event-title.summary h1 span');
+    var date = document.querySelector('div.ds-event-detail div.ds-event-detail-main div div.ds-event-meta-container div a div');
+    var time = document.querySelector('div.ds-event-detail div.ds-event-detail-main div div.ds-event-meta-container div div span');
+    var ticketInfo = document.querySelector('div.ds-event-detail div.ds-event-detail-main div div.ds-event-meta-container div span:nth-child(5) h2');
+    var venue = document.querySelector('div.ds-event-detail div.ds-event-detail-main div div.ds-event-meta span div a h2 span');
+    var latitude = document.querySelector('div.ds-event-detail div.ds-event-detail-main div div.ds-event-meta span div span.geo meta:nth-child(2)');
+    var longitude = document.querySelector('div.ds-event-detail div.ds-event-detail-main div div.ds-event-meta span div span.geo meta:nth-child(4)');
+    var upvotes = document.querySelector('div.ds-btn-container.ds-btn-container-upvote.ds-add-cta a span.ds-upvote-default span.ds-icon-text');
+      // //logging each event and its individual data
+
+      if (title !== null) obj.title = title.innerText;
+      if (date !== null) obj.date = date.innerText;
+      if (time !== null) obj.time = time.innerText;
+      if (ticketInfo !== null) obj.ticketInfo = ticketInfo.title;
+      if (venue !== null) obj.venue = venue.innerText;
+      if (latitude !== null) obj.latitude = latitude.content;
+      if (longitude !== null) obj.longitude = longitude.content;
+      if (upvotes !== null) obj.upvotes = upvotes.innerText;
+      obj.link = window.location.href;
+
+      return obj;
+    })
+    .then(function (result) {
+      results.push(result);
+      
+      //storing the object in a global variable to be used later
+      return results;
+    })
+    .catch(function (error) {
+      console.error('Search failed:', error);
+    });
+    
+  });
+}, Promise.resolve([])).then(function(results){
+  // console.log(do512events);
+  console.dir(results);
+
+  for (var i = 0; i < 16; i++) {
+
+    connection.query('INSERT INTO eventSuggestions '
+    + '(title,date,time,ticketInfo,venue,latitude,longitude,upvotes)'
+    + 'VALUES (?,?,?,?,?,?,?,?)', [results[i].title,results[i].date,results[i].time,results[i].ticketInfo,
+    + results[i].venue,results[i].latitude,results[i].longitude,results[i].upvotes], function(err, rows, fields) {
+      if (err) throw err;
+
+    });
+  }
+
+  do512events = results;
+
+  connection.end();
+  process.exit();
+
+});

@@ -1,0 +1,31 @@
+<head>
+	<script type="text/javascript" src="assets/javascript/app.js"></script>
+</head> 
+
+{{> navbar}}
+
+<div class="container">
+	<div class="jumbotron">
+		<h1 id="username">Welcome {{data.name}}</h1>
+		<div class="container">
+			<p>Thanks for joining the All Y'all community! We're here to provide you suggestions to top eats, drinks and events in Austin. Tell us what you're feeling below, and start experiencing new Austin attractions!</p> 
+		</div>
+	</div>
+</div>
+
+<div class="container">
+
+<!-- Food Section -->
+	<div class="food-section">
+		<div class="row">
+			<div class="col-md-6 thumbnail-main text-center" id="HangwFriends">
+				<img class="food preference-images-main img-responsive" data-name="HangwFriends" id="HangwFriends" data-state="unclicked" src="assets/img/people.jpeg">
+				<h3 class="food caption-main" data-name="HangwFriends" data-state="unclicked" data-type="caption" id="captionHangwFriends">Hang with Friends</h3>
+			</div>
+			<div class="col-md-6 thumbnail-main text-center" id="Loner">
+				<img class="food preference-images-main img-responsive" data-name="Loner" id="Loner" data-state="unclicked" src="assets/img/loner.jpg">
+				<h3 class="food caption-main" data-name="Loner" data-state="unclicked" data-type="caption" id="captionLoner">Be a Loner</h3>
+			</div>
+		</div>
+	</div>	
+</div> 

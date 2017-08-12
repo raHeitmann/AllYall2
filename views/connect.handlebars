@@ -1,0 +1,51 @@
+{{> navbar}}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12 text-">
+                            <h2>Connect With Others</h2>
+                            <hr>
+                        {{#each data.users}}
+                            <div class="row">
+                                <div class="panel panel-default">
+                                    <div class="panel-body">
+                                        <form action="/connect/{{this.id}}" method="POST">
+                                            <div class="col-md-2">
+                                                <img src="/uploads/{{this.image}}" width="80px" height="120px" alt="">
+                                            </div>
+                                            <div class="col-md-8">
+                                                <div class="row">
+                                                    <h5>{{this.userName}}</h5>
+                                                </div>
+                                              
+                                            </div>
+                                       
+
+                                        <div class="col-md-2">
+                                            <button class="btn btn-site btn-lg" style="position: relative; top: 34px;">Add Friend</button>
+
+                                        </div>
+                                    </form>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        
+                            {{/each}}
+                        </div>
+                
+                    
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+</div>

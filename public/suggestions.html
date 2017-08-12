@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Suggestions | All Y'all</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.gstatic.com/firebasejs/4.1.1/firebase.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Oswald" rel="stylesheet">
+    <link rel="icon" type="image/png" sizes="96x96" href="assets/images/favicon-96x96.png">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="assets/css/morgan.css">
+    <link rel="stylesheet" type="text/css" href="assets/css/responsive.css">
+    <script src="assets/javascript/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js"></script>
+</head>
+
+<body>
+    <!-- Static navbar -->
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+                <a class="navbar-brand" href="/profile"><img src="assets/img/orangehat.png" height="50px"></a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav"></ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/main">Home</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/profile">Profile</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/connect">Connect</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/meetups">Meetups</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+            <!--/.nav-collapse -->
+        </div>
+        <!--/.container -->
+    </nav>
+
+    <div class="container">
+        <div class="jumbotron">
+            <h1 id="usernameSuggestions"></h1>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModalInfo" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-lg">
+
+
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 class="modal-title">More Info</h3>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div id="event-name"></div>
+                        <div id="event-address"></div>
+                        <div id="event-date"></div>
+                        <div id="event-time"></div>
+                        <div class="col-md-2 modal-btns">
+                            <button id="parking" class="btn btn-site btn-lg">Find Parking</button>
+                        </div>
+                        <div class="col-md-12">
+                            <p id="mapComments"></p>
+                        </div>
+                    </div>
+                    <div id="map"></div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal -->
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="suggestions-hero">
+                    <img class="hero-image" src="assets/img/restaurants.jpg" alt="restaurants hero image">
+                    <h2 class="hero-title">Eats</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row" id="foodRow0"></div>
+                <div class="row" id="foodRow1"></div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="suggestions-hero">
+                    <img class="hero-image" src="assets/img/bar.jpg" alt="bar hero image">
+                    <h2 class="hero-title">Drinks</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row" id="drinkRow0"></div>
+                <div class="row" id="drinkRow1"></div>
+            </div>
+        </div>
+
+        <div class="col-md-12 restaurant-suggestions">
+            <div class="row">
+                <div class="suggestions-hero">
+                    <img class="hero-image" src="assets/img/event.jpg" alt="event hero image">
+                    <h2 class="hero-title">Events</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 suggestions-list-items" id="eventsSuggestions1"></div>
+        <div class="col-md-6 suggestions-list-items" id="eventsSuggestions2"></div>
+    </div>
+
+    <div class="container"></div>
+    <div class="preferences"></div>
+    <div class="col-md-12 display-preferences"></div>
+
+
+    <script>
+        var infowindowArray = [];
+        var currentRestaurantLat = "";
+        var currentRestaurantLong = "";
+        var lat1, lat2, lat3, lat4, lng1, lng2, lng3, lng4, parking1, parking2, parking3, parking4, me, map, contentString, infowindow;
+
+        function initMap() {
+            var uluru = {
+                lat: Number(currentRestaurantLat),
+                lng: Number(currentRestaurantLong)
+            };
+            parking1 = {
+                lat: Number(lat1),
+                lng: Number(lng1)
+            };
+            parking2 = {
+                lat: Number(lat2),
+                lng: Number(lng2)
+            };
+            parking3 = {
+                lat: Number(lat3),
+                lng: Number(lng3)
+            };
+            parking4 = {
+                lat: Number(lat4),
+                lng: Number(lng4)
+            };
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13,
+                center: uluru
+            });
+            var marker = new google.maps.Marker({
+                position: uluru,
+                map: map
+            });
+
+            var marker1 = new google.maps.Marker({
+                position: parking1,
+                map: map
+            });
+            marker1.addListener('click', function() {
+                infowindowArray[0].open(map, marker1);
+            });
+            var marker2 = new google.maps.Marker({
+                position: parking2,
+                map: map
+            });
+            marker2.addListener('click', function() {
+                infowindowArray[1].open(map, marker2);
+            });
+            var marker3 = new google.maps.Marker({
+                position: parking3,
+                map: map
+            });
+            marker3.addListener('click', function() {
+                infowindowArray[2].open(map, marker3);
+            });
+            var marker4 = new google.maps.Marker({
+                position: parking4,
+                map: map
+            });
+            marker4.addListener('click', function() {
+                infowindowArray[3].open(map, marker4);
+            });
+
+        }
+
+        $('#myModalInfo').on('shown.bs.modal', function() {
+            var currentCenter = map.getCenter(); // Get current center before resizing
+            google.maps.event.trigger(map, "resize");
+            map.setCenter(currentCenter); // Re-set previous center
+            var uluru = {
+                lat: Number(currentRestaurantLat),
+                lng: Number(currentRestaurantLong)
+            };
+            map = new google.maps.Map(document.getElementById('map'), {
+                zoom: 13,
+                center: uluru
+            });
+            var marker = new google.maps.Marker({
+                position: uluru,
+                map: map
+            });
+        });
+
+
+
+        $(document).on("click", "#infoBtn", function() {
+            currentRestaurantLat = $(this).attr("data-lat");
+            currentRestaurantLong = $(this).attr("data-long");
+            console.log(currentRestaurantLat);
+            console.log(currentRestaurantLong);
+        });
+
+        $("#parking").on("click", function() {
+            var url = "https://api.parkwhiz.com/search/?lat=" + currentRestaurantLat + "&lng=" + currentRestaurantLong
+            var apiKey = "&key=874619822654f3bbbf0587277df3bfbb167be451"
+            console.log(url + apiKey);
+
+            $.ajax({
+                url: url + apiKey,
+                method: "GET"
+            }).done(function(data) {
+                var parkingListing = data.parking_listings;
+                console.log(parkingListing == null)
+                console.log(parkingListing)
+
+                if (parkingListing == null) {
+                    $("#mapComments").html("No available parking nearby!");
+                    var uluru = {
+                        lat: Number(currentRestaurantLat),
+                        lng: Number(currentRestaurantLong)
+                    };
+                    map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: 13,
+                        center: uluru
+                    });
+                    var marker = new google.maps.Marker({
+                        position: uluru,
+                        map: map
+                    });
+                } else {
+                    $("#mapComments").html("");
+                    for (var i = 0; i < 4; i++) {
+                        // console.log(parkingListing[i])
+
+                        var street = parkingListing[i].address;
+                        var city = parkingListing[i].city;
+                        var state = parkingListing[i].state;
+
+                        lat1 = parkingListing[0].lat
+                        lng1 = parkingListing[0].lng
+
+                        lat2 = parkingListing[1].lat
+                        lng2 = parkingListing[1].lng
+
+                        lat3 = parkingListing[2].lat
+                        lng3 = parkingListing[2].lng
+
+                        lat4 = parkingListing[3].lat
+                        lng4 = parkingListing[3].lng
+
+
+                        contentString = '<div id="content">' +
+                            '<div id="siteNotice">' +
+                            '</div>' +
+                            '<h1 id="firstHeading" class="firstHeading">' + parkingListing[i].location_name + '</h1>' +
+                            '<div id="bodyContent">' +
+                            '<p><b>' + parkingListing[i].address + '<br>' + parkingListing[i].city + '<br>' + parkingListing[i].state + '</b></p>' +
+                            '<p>Price: $' + parkingListing[i].price + '</p>' +
+                            '<p>Available Spots: ' + parkingListing[i].available_spots + '</p>' +
+                            '<p>Buy Parking: ' + '<a href=' + parkingListing[i].www_reserve_url + '>ParkWhiz</>' + '</p>' +
+                            '</div>' +
+                            '</div>';
+
+                        infowindowArray[i] = new google.maps.InfoWindow({
+                            content: contentString
+                        });
+
+                        initMap()
+                    }
+                }
+            });
+
+        })
+    </script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCXgCkayPHIbeRCWDQX_UG_cPL0yUKP_GI&callback=initMap">
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+</body>
+
+</html>

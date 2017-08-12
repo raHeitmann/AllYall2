@@ -1,0 +1,60 @@
+<head>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/css/materialize.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.1/js/materialize.min.js"></script>
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+{{> navbar}}
+
+	<div class="container">
+
+		<a id="join" class="waves-effect waves-light btn" href="">Join</a>
+
+		<div class="row">
+            <div class="col-md-12">
+			    <div class="col-md-4">
+                    <div class="event-info">
+                        {{#each meetup}} 
+                            <p>{{this.eventName}}<p>
+                            <p>{{this.date}}<p>
+                            <p>{{this.totalAttendees}}<p>   
+                        {{/each}} 
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-content black-text">
+                            <span class="card-title">Members</span>
+                            {{#each members}} 
+                            <img class="center" src=""+image"">
+                                <p{{this.name}}<p>   
+                            {{/each}} 
+                        </div>
+                    </div>
+
+			</div>
+
+			<div class="col m9">
+                 {{#each eventSuggestions}} 
+                <div class="row">
+                    <div class="card horizontal">
+                    <div class="card-stacked">
+                        <div class="card-content flex">
+                        <p>{{this.title}}</p>
+                        <p>{{this.venue}}</p>
+                        <p>Up Votes: {{this.upVote}}</p>
+                        <p>Down Votes: {{this.downVote}}</p>
+                        <a id="info" class="waves-effect waves-light btn" href="">More Info</a>
+                        </div>
+                    </div>
+                    <div class="card-action flex">
+                        <i class="block medium material-icons">thumb_up</i>
+                        <i class="block medium material-icons">thumb_down</i>
+                    </div>
+                    </div>
+                </div>
+                 {{/each}} 
+			</div>
+
+		</div>
+	</div>

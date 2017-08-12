@@ -1,0 +1,70 @@
+<head>
+	{{!-- <link rel="stylesheet" type="text/css" href="assets/css/skeleton.css"> --}}
+	<script type="text/javascript" src="assets/javascript/app.js"></script>
+</head>
+
+{{> navbar}}
+
+<div class="container">
+	<div class="row">
+		<div class="col-md-4">
+			<div class="row">
+				<div class="panel panel-default">
+					<div class="panel-body">
+						<div class="create-event">
+							<h2>Create a Meetup</h2><br>
+							<div class="col-md-12">
+								<form action="/meetups" method="POST">
+									<div class="form-group">
+										<label for="eventName">Event Name</label>
+										<input type="tet" class="form-control" name="eventName" placeholder="Event Name">
+									</div>
+									<div class="form-group">
+										<label for="date">Event Date (YYYY-MM-DD)</label>
+										<input type="text" class="form-control" name="date" placeholder="Event Date (2017-01-12)">
+									</div>
+
+										<input type="hidden" value="true">
+										<button class="btn btn-site btn-sm" type="submit"><a style="color: inherit; text-decoration: none;">Add Event</a></button>
+									</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-8">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-md-12">
+							<h2>All Meetups</h2><br>
+
+							{{#each event}}
+							<div class="col-md-12">
+								<div class="col-md-4">
+									<a href="/{{this.eventName}}"><img class="calendar" src="assets/img/calendar.png" width="100%">
+									<h3 class="calendar-date">{{this.date}}</h3></a>	
+								</div>
+								<div class="col-md-8">
+									<div class="event-info">
+										<h3 style="color: #FB7722;">{{this.eventName}}</h3>
+										<h4 style="font-size: 24px; color: #000;">Total Attendees: 
+										{{this.totalAttendees}}</h3>
+									</div>	
+								</div>
+							</div>
+							{{/each}}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+										

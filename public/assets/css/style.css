@@ -1,0 +1,28 @@
+.center {
+	display: block;
+	margin: 10px auto;
+}
+
+.block {
+	display: block;
+}
+
+.flex {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+}
+
+#info {
+	width: 150px;
+}
+
+#join {
+	position: absolute;
+	top: 8px;
+	right: 15px;
+}
+
+.btn {
+	background: #fd6509;
+}
